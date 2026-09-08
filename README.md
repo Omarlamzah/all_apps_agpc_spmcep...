@@ -71,11 +71,11 @@ Do not commit signing files, API secrets, or local environment files.
 
 The repository includes an `agpc-ios-testflight` workflow in
 `codemagic.yaml`. It builds a signed AGPC IPA with bundle identifier
-`com.itechevent.agpc2026` and uploads it to App Store Connect.
+`com.medkabnet.agpc.2026` and uploads it to App Store Connect.
 
 Before the first build:
 
-1. Register `com.itechevent.agpc2026` in Apple Developer.
+1. Register `com.medkabnet.agpc.2026` in Apple Developer.
 2. Create the new `AGPC 2026` app record in App Store Connect.
 3. Add an App Store Connect integration in Codemagic named
    `agpc_app_store`.

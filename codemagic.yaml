@@ -10,7 +10,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.itechevent.agpc2026
+        bundle_identifier: com.medkabnet.agpc.2026
       vars:
         APP_FLAVOR: agpc
         API_URL: https://events.itechevent.com/api/public/api/public/mobile
