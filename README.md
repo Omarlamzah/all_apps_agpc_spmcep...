@@ -66,3 +66,21 @@ flutter build web --release \
 ```
 
 Do not commit signing files, API secrets, or local environment files.
+
+## Codemagic and TestFlight
+
+The repository includes an `agpc-ios-testflight` workflow in
+`codemagic.yaml`. It builds a signed AGPC IPA with bundle identifier
+`com.itechevent.agpc2026` and uploads it to App Store Connect.
+
+Before the first build:
+
+1. Register `com.itechevent.agpc2026` in Apple Developer.
+2. Create the new `AGPC 2026` app record in App Store Connect.
+3. Add an App Store Connect integration in Codemagic named
+   `agpc_app_store`.
+4. Add this GitHub repository to Codemagic and run the
+   `AGPC 2026 - iOS TestFlight` workflow from `main`.
+
+The workflow uploads to App Store Connect but does not automatically submit
+the app for App Review.

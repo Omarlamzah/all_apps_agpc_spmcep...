@@ -1,0 +1,56 @@
+workflows:
+  agpc-ios-testflight:
+    name: AGPC 2026 - iOS TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    integrations:
+      app_store_connect: agpc_app_store
+
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.itechevent.agpc2026
+      vars:
+        APP_FLAVOR: agpc
+        API_URL: https://events.itechevent.com/api/public/api/public/mobile
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+
+    cache:
+      cache_paths:
+        - $FLUTTER_ROOT/.pub-cache
+        - $HOME/Library/Caches/CocoaPods
+
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+
+      - name: Analyze project
+        script: flutter analyze
+
+      - name: Run tests
+        script: flutter test
+
+      - name: Configure iOS code signing
+        script: xcode-project use-profiles --project ios/Runner.xcodeproj
+
+      - name: Build signed AGPC IPA
+        script: |
+          flutter build ipa --release \
+            --build-name=1.0.0 \
+            --build-number=$PROJECT_BUILD_NUMBER \
+            --dart-define=APP_FLAVOR=$APP_FLAVOR \
+            --dart-define=API_URL=$API_URL \
+            --export-options-plist=/Users/builder/export_options.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
