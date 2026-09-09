@@ -8,6 +8,8 @@ workflows:
       app_store_connect: agpc_app_store
 
     environment:
+      groups:
+        - code-signing
       vars:
         APP_FLAVOR: agpc
         API_URL: https://events.itechevent.com/api/public/api/public/mobile
