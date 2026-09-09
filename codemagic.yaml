@@ -12,7 +12,7 @@ workflows:
         APP_FLAVOR: agpc
         API_URL: https://events.itechevent.com/api/public/api/public/mobile
         BUNDLE_ID: com.itechevent.agpc2026
-      flutter: stable
+      flutter: 3.41.6
       xcode: latest
       cocoapods: default
 
