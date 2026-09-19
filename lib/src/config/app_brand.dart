@@ -202,9 +202,13 @@ class AppBrand {
     'somcep': AppBrand(
       code: 'somcep',
       name: 'SOMCEP',
-      fullName: 'SOMCEP Annual Congress',
+      fullName:
+          'Annual Meeting of the Moroccan Society of Aesthetic and Plastic Surgeons',
       primaryColor: Color(0xFF2C3373),
       secondaryColor: Color(0xFFB4E1FA),
+      location: 'Marrakech, Morocco',
+      venueName: 'Savoy Le Grand Hotel',
+      presidentName: 'Dr Hatim Droussi',
       features: {
         AppFeature.program,
         AppFeature.speakers,
