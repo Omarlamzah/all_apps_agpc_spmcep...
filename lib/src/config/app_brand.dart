@@ -9,6 +9,8 @@ enum AppFeature {
   floorPlan,
   voting,
   liveStream,
+  president,
+  board,
 }
 
 class AppBrand {
@@ -174,6 +176,8 @@ class AppBrand {
     'floor_plan' => AppFeature.floorPlan,
     'voting' => AppFeature.voting,
     'live_stream' => AppFeature.liveStream,
+    'president' => AppFeature.president,
+    'board' => AppFeature.board,
     _ => null,
   };
 
@@ -196,6 +200,8 @@ class AppBrand {
         AppFeature.mediaLibrary,
         AppFeature.eposters,
         AppFeature.voting,
+        AppFeature.president,
+        AppFeature.board,
       },
       boardMembers: _agpcBoardMembers,
     ),
@@ -215,6 +221,8 @@ class AppBrand {
         AppFeature.sponsors,
         AppFeature.floorPlan,
         AppFeature.eposters,
+        AppFeature.president,
+        AppFeature.board,
       },
     ),
     'ama': AppBrand(
@@ -229,6 +237,8 @@ class AppBrand {
         AppFeature.sponsors,
         AppFeature.liveStream,
         AppFeature.eposters,
+        AppFeature.president,
+        AppFeature.board,
       },
     ),
     'smcpre': AppBrand(
@@ -242,6 +252,8 @@ class AppBrand {
         AppFeature.speakers,
         AppFeature.sponsors,
         AppFeature.eposters,
+        AppFeature.president,
+        AppFeature.board,
       },
     ),
   };

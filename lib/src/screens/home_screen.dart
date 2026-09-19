@@ -26,22 +26,75 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+enum _NavTab { home, program, media, speakers, more }
+
+class _TabDef {
+  const _TabDef({
+    required this.tab,
+    required this.icon,
+    required this.label,
+    required this.builder,
+  });
+
+  final _NavTab tab;
+  final IconData icon;
+  final String label;
+  final WidgetBuilder builder;
+}
+
 class _HomeScreenState extends State<HomeScreen> {
-  int selectedIndex = 0;
+  _NavTab currentTab = _NavTab.home;
+
+  List<_TabDef> _tabs(BuildContext context) {
+    return [
+      _TabDef(
+        tab: _NavTab.home,
+        icon: Icons.home_rounded,
+        label: 'Accueil',
+        builder: (_) => _CongressHome(
+          brand: widget.brand,
+          openTab: (tab) => setState(() => currentTab = tab),
+        ),
+      ),
+      if (widget.brand.supports(AppFeature.program))
+        _TabDef(
+          tab: _NavTab.program,
+          icon: Icons.calendar_month_rounded,
+          label: 'Programme',
+          builder: (_) => _ProgramPage(brand: widget.brand),
+        ),
+      if (widget.brand.supports(AppFeature.mediaLibrary))
+        _TabDef(
+          tab: _NavTab.media,
+          icon: Icons.video_library_rounded,
+          label: 'Média',
+          builder: (_) => MediaLibraryScreen(brand: widget.brand),
+        ),
+      if (widget.brand.supports(AppFeature.speakers))
+        _TabDef(
+          tab: _NavTab.speakers,
+          icon: Icons.groups_2_rounded,
+          label: 'Orateurs',
+          builder: (_) => _SpeakersPage(brand: widget.brand),
+        ),
+      _TabDef(
+        tab: _NavTab.more,
+        icon: Icons.grid_view_rounded,
+        label: 'Plus',
+        builder: (_) => _MorePage(brand: widget.brand),
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    final showMedia = widget.brand.supports(AppFeature.mediaLibrary);
-    final pages = [
-      _CongressHome(
-        brand: widget.brand,
-        openPage: (index) => setState(() => selectedIndex = index),
-      ),
-      _ProgramPage(brand: widget.brand),
-      if (showMedia) MediaLibraryScreen(brand: widget.brand),
-      _SpeakersPage(brand: widget.brand),
-      _MorePage(brand: widget.brand),
-    ];
+    final tabs = _tabs(context);
+    var activeIndex = tabs.indexWhere((t) => t.tab == currentTab);
+    if (activeIndex == -1) {
+      activeIndex = 0;
+      currentTab = _NavTab.home;
+    }
+    final pages = tabs.map((t) => t.builder(context)).toList();
     return Scaffold(
       backgroundColor: Color.lerp(widget.brand.primaryColor, Colors.black, .32),
       body: Center(
@@ -51,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: _canvas,
             child: SafeArea(
               bottom: false,
-              child: IndexedStack(index: selectedIndex, children: pages),
+              child: IndexedStack(index: activeIndex, children: pages),
             ),
           ),
         ),
@@ -66,8 +119,13 @@ class _HomeScreenState extends State<HomeScreen> {
               top: false,
               child: _GlassNavigation(
                 brand: widget.brand,
-                selectedIndex: selectedIndex,
-                onSelected: (index) => setState(() => selectedIndex = index),
+                items: tabs.map((t) => (t.icon, t.label)).toList(),
+                selectedIndex: activeIndex,
+                onSelected: (index) {
+                  if (index >= 0 && index < tabs.length) {
+                    setState(() => currentTab = tabs[index].tab);
+                  }
+                },
               ),
             ),
           ),
@@ -80,23 +138,17 @@ class _HomeScreenState extends State<HomeScreen> {
 class _GlassNavigation extends StatelessWidget {
   const _GlassNavigation({
     required this.brand,
+    required this.items,
     required this.selectedIndex,
     required this.onSelected,
   });
   final AppBrand brand;
+  final List<(IconData, String)> items;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      (Icons.home_rounded, 'Accueil'),
-      (Icons.calendar_month_rounded, 'Programme'),
-      if (brand.supports(AppFeature.mediaLibrary))
-        (Icons.video_library_rounded, 'Média'),
-      (Icons.groups_2_rounded, 'Orateurs'),
-      (Icons.grid_view_rounded, 'Plus'),
-    ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 7, 12, 10),
       child: GlassContainer(
@@ -164,9 +216,9 @@ class _GlassNavigation extends StatelessWidget {
 }
 
 class _CongressHome extends StatelessWidget {
-  const _CongressHome({required this.brand, required this.openPage});
+  const _CongressHome({required this.brand, required this.openTab});
   final AppBrand brand;
-  final ValueChanged<int> openPage;
+  final ValueChanged<_NavTab> openTab;
 
   @override
   Widget build(BuildContext context) {
@@ -176,9 +228,9 @@ class _CongressHome extends StatelessWidget {
           'Programme',
           'Sessions & horaires',
           Icons.calendar_month_rounded,
-          () => openPage(1),
+          () => openTab(_NavTab.program),
         ),
-      if (brand.liveStream?.isAvailable ?? false)
+      if (brand.supports(AppFeature.liveStream) && (brand.liveStream?.isAvailable ?? false))
         _HomeAction(
           'En direct',
           brand.liveStream!.isLive ? 'Live maintenant' : 'Voir la diffusion',
@@ -190,7 +242,7 @@ class _CongressHome extends StatelessWidget {
           'Médiathèque',
           'Vidéos & conférences',
           Icons.video_library_rounded,
-          () => openPage(2),
+          () => openTab(_NavTab.media),
         ),
       if (brand.supports(AppFeature.eposters))
         _HomeAction(
@@ -205,14 +257,14 @@ class _CongressHome extends StatelessWidget {
         Icons.location_on_rounded,
         () => _showInformation(context, brand),
       ),
-      if (brand.hasPresidentContent)
+      if (brand.supports(AppFeature.president) && brand.hasPresidentContent)
         _HomeAction(
           'Le président',
           'Lire son message',
           Icons.format_quote_rounded,
           () => _showPresident(context, brand),
         ),
-      if (brand.boardMembers.isNotEmpty)
+      if (brand.supports(AppFeature.board) && brand.boardMembers.isNotEmpty)
         _HomeAction(
           'Bureau',
           'Équipe dirigeante',
@@ -224,7 +276,7 @@ class _CongressHome extends StatelessWidget {
           'Orateurs',
           'Experts invités',
           Icons.record_voice_over_rounded,
-          () => openPage(brand.supports(AppFeature.mediaLibrary) ? 3 : 2),
+          () => openTab(_NavTab.speakers),
         ),
       if (brand.supports(AppFeature.sponsors))
         _HomeAction(
@@ -273,7 +325,7 @@ class _CongressHome extends StatelessWidget {
                     .slideY(begin: .07, end: 0),
           ),
         ),
-        if (brand.agenda.isNotEmpty) ...[
+        if (brand.supports(AppFeature.program) && brand.agenda.isNotEmpty) ...[
           const SliverToBoxAdapter(child: SizedBox(height: 29)),
           const SliverPadding(
             padding: EdgeInsets.symmetric(horizontal: 20),
@@ -290,7 +342,7 @@ class _CongressHome extends StatelessWidget {
               child: _NextSessionCard(
                 brand: brand,
                 session: brand.agenda.first,
-                onTap: () => openPage(1),
+                onTap: () => openTab(_NavTab.program),
               ),
             ),
           ),
@@ -3597,24 +3649,24 @@ class _MorePage extends StatelessWidget {
         'Lieu, date, accès et contact',
         () => _showInformation(context, brand),
       ),
-      if (brand.liveStream?.isAvailable ?? false)
+      if (brand.supports(AppFeature.liveStream) && (brand.liveStream?.isAvailable ?? false))
         _MoreEntry(
           Icons.live_tv_rounded,
           brand.liveStream!.isLive ? 'En direct maintenant' : 'Diffusion vidéo',
           brand.liveStream!.title,
           () => _openLiveStream(context, brand),
         ),
-      if (brand.hasPresidentContent)
+      if (brand.supports(AppFeature.president) && brand.hasPresidentContent)
         _MoreEntry(
           Icons.format_quote_rounded,
           'Mot du président',
           brand.presidentName ?? 'Message officiel',
           () => _showPresident(context, brand),
         ),
-      if (brand.boardMembers.isNotEmpty)
+      if (brand.supports(AppFeature.board) && brand.boardMembers.isNotEmpty)
         _MoreEntry(
           Icons.account_balance_rounded,
-          'Bureau de l’AGPC',
+          'Bureau',
           '${brand.boardMembers.length} membres',
           () => _openBoard(context, brand),
         ),
