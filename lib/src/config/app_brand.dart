@@ -78,7 +78,8 @@ class AppBrand {
 
   bool supports(AppFeature feature) => features.contains(feature);
 
-  String get logoAsset => 'assets/branding/$code.png';
+  String get logoAsset =>
+      'assets/branding/${code.toLowerCase().replaceAll('_', '')}.png';
 
   bool get hasPresidentContent =>
       (presidentName?.trim().isNotEmpty ?? false) ||
@@ -122,6 +123,8 @@ class AppBrand {
           .toList(),
       boardMembers: apiBoardMembers.isEmpty && code.toLowerCase() == 'agpc'
           ? _agpcBoardMembers
+          : apiBoardMembers.isEmpty && code.toLowerCase() == 'amg11'
+          ? _amg11BoardMembers
           : apiBoardMembers,
       agenda: (json['agenda'] as List<dynamic>? ?? const [])
           .map((item) => AgendaItem.fromJson(item as Map<String, dynamic>))
@@ -256,7 +259,39 @@ class AppBrand {
         AppFeature.board,
       },
     ),
+    'amg11': AppBrand(
+      code: 'amg11',
+      name: 'AMG 11',
+      fullName: "4\u00e8me Congr\u00e8s Al Quaraouiyine de l'Omnipraticien de F\u00e8s",
+      primaryColor: Color(0xFF061A3A),
+      secondaryColor: Color(0xFF3AAA35),
+      location: 'F\u00e8s, Maroc',
+      venueName: 'H\u00f4tel Marriott Jnan Palace',
+      presidentName: 'Dr Salima Filali',
+      specialty: 'M\u00e9decine G\u00e9n\u00e9rale',
+      contactEmail: 'congresalqaraouine.amg11fes@gmail.com',
+      features: {
+        AppFeature.program,
+        AppFeature.speakers,
+        AppFeature.sponsors,
+        AppFeature.eposters,
+        AppFeature.president,
+        AppFeature.board,
+      },
+      boardMembers: _amg11BoardMembers,
+    ),
   };
+
+  static const _amg11BoardMembers = <EventBoardMember>[
+    EventBoardMember(
+      name: 'Dr Salima Filali',
+      role: 'Pr\u00e9sidente',
+    ),
+    EventBoardMember(
+      name: 'Dr Imane Hajji',
+      role: 'Vice-Pr\u00e9sidente',
+    ),
+  ];
 
   static const _agpcBoardMembers = <EventBoardMember>[
     EventBoardMember(
@@ -410,18 +445,18 @@ class EventSpeaker {
 class EventSponsor {
   const EventSponsor({
     required this.name,
-    required this.level,
+    this.level,
     this.websiteUrl,
     this.logoUrl,
   });
   final String name;
-  final String level;
+  final String? level;
   final String? websiteUrl;
   final String? logoUrl;
 
   factory EventSponsor.fromJson(Map<String, dynamic> json) => EventSponsor(
     name: json['name'] as String,
-    level: json['level'] as String,
+    level: json['level'] as String?,
     websiteUrl: json['website_url'] as String?,
     logoUrl: AppBrand._mediaUrl(json['logo_url'] as String?),
   );

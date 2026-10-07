@@ -1483,21 +1483,22 @@ class _ViewSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    height: 51,
+    height: 48,
     padding: const EdgeInsets.all(4),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(17),
+      borderRadius: BorderRadius.circular(15),
       border: Border.all(color: _line),
       boxShadow: const [
         BoxShadow(
-          color: Color(0x08000000),
-          blurRadius: 16,
-          offset: Offset(0, 7),
+          color: Color(0x0A000000),
+          blurRadius: 12,
+          offset: Offset(0, 4),
         ),
       ],
     ),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SwitchItem(
           label: 'Agenda',
@@ -1506,6 +1507,7 @@ class _ViewSwitch extends StatelessWidget {
           brand: brand,
           onTap: () => onChanged(false),
         ),
+        const SizedBox(width: 4),
         _SwitchItem(
           label: 'Document PDF',
           icon: Icons.picture_as_pdf_rounded,
@@ -1534,38 +1536,49 @@ class _SwitchItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Expanded(
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(13),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        decoration: BoxDecoration(
-          color: selected ? brand.primaryColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(13),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: brand.primaryColor.withValues(alpha: .2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 5),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 16, color: selected ? Colors.white : _muted),
-            const SizedBox(width: 7),
-            Text(
-              label,
-              style: TextStyle(
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(11),
+        splashColor: brand.primaryColor.withValues(alpha: .12),
+        highlightColor: brand.primaryColor.withValues(alpha: .06),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            color: selected ? brand.primaryColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(11),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: brand.primaryColor.withValues(alpha: .28),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 17,
                 color: selected ? Colors.white : _muted,
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
               ),
-            ),
-          ],
+              const SizedBox(width: 7),
+              Text(
+                label,
+                style: TextStyle(
+                  color: selected ? Colors.white : _ink.withValues(alpha: .75),
+                  fontSize: 12.5,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                  letterSpacing: -.1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ),
@@ -3461,7 +3474,10 @@ class _SponsorCard extends StatelessWidget {
             ),
             const SizedBox(height: 3),
             Text(
-              sponsor.level.toUpperCase(),
+              (sponsor.level?.trim().isNotEmpty == true
+                      ? sponsor.level!.trim()
+                      : 'Partenaire')
+                  .toUpperCase(),
               maxLines: 1,
               style: TextStyle(
                 color: brand.primaryColor,

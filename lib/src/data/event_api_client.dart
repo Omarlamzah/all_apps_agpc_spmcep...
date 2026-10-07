@@ -35,28 +35,41 @@ class EventApiClient {
 
   Future<AppBrand> fetchBrand(String eventCode) async {
     Object? failure;
-    try {
-      final response = await _client
-          .get(
-            Uri.parse('$_baseUrl/events/$eventCode/config'),
-            headers: const {'Accept': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 10));
+    final candidates = <String>{
+      eventCode,
+      if (eventCode.toLowerCase() == 'ama') '7',
+      if (eventCode.toLowerCase() == 'amg11') ...['15', 'AMG_11'],
+      eventCode.toLowerCase(),
+      eventCode.toUpperCase(),
+    };
 
-      if (response.statusCode == 200) {
-        final brand = _decodeBrand(response.body);
-        await _writeCache(eventCode, response.body);
-        return brand;
+    for (final code in candidates) {
+      try {
+        final response = await _client
+            .get(
+              Uri.parse('$_baseUrl/events/$code/config'),
+              headers: const {'Accept': 'application/json'},
+            )
+            .timeout(const Duration(seconds: 10));
+
+        if (response.statusCode == 200) {
+          final brand = _decodeBrand(response.body);
+          await _writeCache(eventCode, response.body);
+          return brand;
+        }
+        failure = EventApiException(
+          'The event server returned ${response.statusCode}.',
+        );
+      } catch (error) {
+        failure = error;
       }
-      failure = EventApiException(
-        'The event server returned ${response.statusCode}.',
-      );
-    } catch (error) {
-      failure = error;
     }
 
     final cached = await _readCache(eventCode);
     if (cached != null) return _decodeBrand(cached);
+
+    final staticFallback = AppBrand.brands[eventCode.toLowerCase()];
+    if (staticFallback != null) return staticFallback;
 
     if (failure case final EventApiException exception) throw exception;
     throw const EventApiException(

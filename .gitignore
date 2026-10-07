@@ -54,3 +54,4 @@ app.*.map.json
 **/*.jks
 **/*.p12
 **/*.pem
+playstore_assets/
