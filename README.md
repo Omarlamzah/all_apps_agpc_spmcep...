@@ -81,3 +81,15 @@ Before the first SOMCEP build:
 4. Run the `SOMCEP 2026 - iOS TestFlight` workflow from `main`.
 
 The workflow uploads to App Store Connect TestFlight without automatically submitting the app for App Review.
+
+## AMA iOS build
+
+Select `AMA 2026 - iOS TestFlight` in Codemagic. This workflow prepares the
+iOS name (`AMA`), bundle identifier (`ma.congress.ama`) and AMA icon before
+applying the App Store signing profile. Commit `scripts/prepare_ios.py` and
+`assets/branding/ama_app_icon.png` together with `codemagic.yaml`.
+
+Create the AMA app record in App Store Connect with bundle ID `ma.congress.ama`.
+The `agpc_app_store` integration and `code-signing` environment group must
+have access to the matching Apple team and distribution signing credentials.
+A signed iOS archive must be verified on Codemagic's macOS runner.
