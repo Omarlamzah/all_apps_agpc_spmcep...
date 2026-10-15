@@ -253,7 +253,7 @@ class AppBrand {
       location: 'Tanger, Maroc',
       venueName: 'Royal Tulip City Center',
       specialty: 'Chirurgie Plastique Reconstructrice et Esthétique',
-      websiteUrl: 'https://www.somcpre.com',
+      websiteUrl: 'https://smcpre.itechevent.com',
       contactEmail: 'contact@somcpre.com',
       contactPhone: '+212 661 410 667',
       features: {
