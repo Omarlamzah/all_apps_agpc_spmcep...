@@ -310,7 +310,7 @@ workflows:
         APP_FLAVOR: smcpre
         APP_NAME: "SMCPRE"
         API_URL: https://events.itechevent.com/api/public/api/public/mobile
-        BUNDLE_ID: com.itechevent.smcpre2026
+        BUNDLE_ID: ma.congress.smcpre
       flutter: 3.41.6
       xcode: latest
       cocoapods: default
